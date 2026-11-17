@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ClubDetail } from "@/components/clubs/club-detail";
 
-export const metadata: Metadata = { title: "Club | AI Hub" };
+export const metadata: Metadata = { title: "Club | QRpresso" };
 
 export default async function ClubDetailPage({
   params,

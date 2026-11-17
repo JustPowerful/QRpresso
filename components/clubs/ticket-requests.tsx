@@ -70,7 +70,7 @@ export function TicketRequests({ clubId, eventId }: { clubId: string; eventId: s
                         <p className="truncate text-sm text-muted-foreground">{request.user.email}</p>
                         <p className="mt-1 text-xs text-muted-foreground">Requested {new Date(request.requestedAt).toLocaleString()}</p>
                       </div>
-                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
                         <span className="w-fit rounded-full bg-secondary px-3 py-1.5 text-xs font-medium text-secondary-foreground">{statusLabels[request.status] ?? request.status}</span>
                         {isActive && (
                           <>

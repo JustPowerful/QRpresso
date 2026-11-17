@@ -47,9 +47,9 @@ export function CreateClubDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <Button type="button" onClick={() => setOpen(true)} className="gap-2">
+      <Button type="button" onClick={() => setOpen(true)} aria-label="Create club" className="size-9 gap-2 px-0 sm:h-9 sm:w-auto sm:px-4">
         <Plus aria-hidden="true" />
-        Create club
+        <span className="hidden sm:inline">Create club</span>
       </Button>
       <DialogPortal>
         <DialogBackdrop />

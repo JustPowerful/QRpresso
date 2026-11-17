@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { TicketRequests } from "@/components/clubs/ticket-requests";
 
-export const metadata: Metadata = { title: "Ticket requests | AI Hub" };
+export const metadata: Metadata = { title: "Ticket requests | QRpresso" };
 
 export default async function TicketRequestsPage({
   params,

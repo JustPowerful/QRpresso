@@ -27,8 +27,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AI Hub",
-  description: "A thoughtful workspace for your AI tools and ideas.",
+  title: "QRpresso",
+  description:
+    "An easy-to-use but innovative event management platform for student clubs.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

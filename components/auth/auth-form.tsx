@@ -63,7 +63,7 @@ export function AuthForm({ mode }: AuthFormProps) {
           <span className="grid size-9 place-items-center rounded-full bg-[#d9e6d7] text-[#182a23]">
             a
           </span>
-          ai hub
+          QRpresso
         </Link>
         <div className="relative z-10 max-w-xl pb-12">
           <p className="mb-5 text-xs font-semibold uppercase tracking-[0.24em] text-[#bbd0bd]">
@@ -78,7 +78,7 @@ export function AuthForm({ mode }: AuthFormProps) {
           </p>
         </div>
         <p className="relative z-10 text-xs text-white/45">
-          © 2026 AI Hub. Built for curious minds.
+          © 2026 QRpresso. Built for curious minds.
         </p>
       </section>
 
@@ -91,11 +91,11 @@ export function AuthForm({ mode }: AuthFormProps) {
             <span className="grid size-9 place-items-center rounded-full bg-[#182a23] text-white">
               a
             </span>
-            ai hub
+            QRpresso
           </Link>
           <div className="mb-9">
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              Welcome to AI Hub
+              Welcome to QRpresso
             </p>
             <h2 className="font-heading text-4xl tracking-tight">
               {isRegister ? "Create your account" : "Welcome back"}
@@ -188,7 +188,7 @@ export function AuthForm({ mode }: AuthFormProps) {
           </form>
 
           <p className="mt-7 text-center text-sm text-muted-foreground">
-            {isRegister ? "Already have an account?" : "New to AI Hub?"}{" "}
+            {isRegister ? "Already have an account?" : "New to QRpresso?"}{" "}
             <Link
               href={isRegister ? "/login" : "/register"}
               className="font-semibold text-foreground underline-offset-4 hover:underline"

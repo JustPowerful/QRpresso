@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { EventDetail } from "@/components/clubs/event-detail";
 
-export const metadata: Metadata = { title: "Event | AI Hub" };
+export const metadata: Metadata = { title: "Event | QRpresso" };
 
 export default async function EventDetailPage({
   params,
