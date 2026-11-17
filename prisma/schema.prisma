@@ -16,6 +16,11 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
+  tickets Ticket[]
+  ticketRequests TicketRequest[]
+  memberships Membership[]
+
+
   sessions Session[]
   accounts Account[]
 
@@ -70,4 +75,89 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+enum Role {
+  FOUNDER // The superadmin of the club, can manage everything
+  MANAGER // Can manage members and content, but cannot delete the club
+  MEMBER // Regular member
+}
+
+model Club {
+  id    String @id @default(uuid())
+  name String
+  description String?
+  profileImage String?
+  coverImage String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  memberships Membership[]
+  events Event[]
+}
+
+model Membership {
+  id String @id @default(uuid())
+  userId String
+  clubId String
+  role String @default("member")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  club Club @relation(fields: [clubId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([clubId])
+}
+
+model Event {
+  id String @id @default(uuid())
+  name String
+  description String?
+  date DateTime // The date and time of the event
+  location String? // Location of the event
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt 
+
+  thumbnail String? // Optional thumbnail image for the event
+
+  clubId String
+  club Club @relation(fields: [clubId], references: [id], onDelete: Cascade)
+
+  tickets Ticket[]
+  ticketRequests TicketRequest[]
+
+  @@index([clubId])
+}
+
+model Ticket {
+  id String @id @default(uuid())
+  eventId String
+  userId String
+  purchasedAt DateTime @default(now())
+  price Float
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+  @@index([userId])
+}
+
+// used when an event is not free and the user wants to request a ticket for it.
+model TicketRequest {
+  id String @id @default(nanoid()) // nano ID is used here to generate a shorter unique ID for the ticket request
+  eventId String
+  userId String
+  status String @default("pending") // pending, approved, rejected
+  requestedAt DateTime @default(now())
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+  @@index([userId])
 }
