@@ -147,6 +147,7 @@ model Ticket {
   userId String
   purchasedAt DateTime @default(now())
   price Float
+  emailSentAt DateTime?
 
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)

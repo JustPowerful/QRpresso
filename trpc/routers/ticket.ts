@@ -3,6 +3,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import type { Prisma } from "@/app/generated/prisma/client";
+import { emailTicket } from "@/lib/ticket-email";
 
 /**
  * This functions locks the event row in the database for the duration of the transaction to prevent race conditions when multiple users are trying to RSVP or request tickets for the same event at the same time.
@@ -11,11 +12,22 @@ async function lockEvent(tx: Prisma.TransactionClient, eventId: string) {
   await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${eventId}))`;
 }
 
+async function deliverTicketEmail(ticketId: string) {
+  try {
+    await emailTicket(ticketId);
+  } catch {
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: "The ticket was granted, but its email could not be sent. Please retry to send it.",
+    });
+  }
+}
+
 export const ticketRouter = createTRPCRouter({
   rsvp: protectedProcedure
     .input(z.object({ eventId: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {
-      return db.$transaction(async (tx) => {
+      const result = await db.$transaction(async (tx) => {
         await lockEvent(tx, input.eventId);
 
         const event = await tx.event.findUnique({
@@ -96,6 +108,8 @@ export const ticketRouter = createTRPCRouter({
           alreadyRegistered: false,
         };
       });
+      await deliverTicketEmail(result.ticketId);
+      return result;
     }),
 
   cancelRsvp: protectedProcedure
@@ -346,7 +360,7 @@ export const ticketRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      return db.$transaction(async (tx) => {
+      const result = await db.$transaction(async (tx) => {
         const requestReference = await tx.ticketRequest.findUnique({
           where: { id: input.requestId },
           select: { eventId: true },
@@ -414,6 +428,8 @@ export const ticketRouter = createTRPCRouter({
 
         return { ticketId: ticket.id, price: ticket.price, alreadyGranted: false };
       });
+      await deliverTicketEmail(result.ticketId);
+      return result;
     }),
 
   cancelRequest: protectedProcedure

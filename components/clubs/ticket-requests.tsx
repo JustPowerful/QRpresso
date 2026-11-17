@@ -22,7 +22,7 @@ export function TicketRequests({ clubId, eventId }: { clubId: string; eventId: s
   const queryClient = useQueryClient();
   const requests = useQuery(trpc.ticket.requests.queryOptions({ eventId, query: search }));
   const refresh = () => queryClient.invalidateQueries();
-  const markPaid = useMutation(trpc.ticket.markPaid.mutationOptions({ onSuccess: refresh }));
+  const markPaid = useMutation(trpc.ticket.markPaid.mutationOptions({ onSuccess: refresh, onError: refresh }));
   const cancelRequest = useMutation(trpc.ticket.cancelRequest.mutationOptions({ onSuccess: refresh }));
   const error = markPaid.error ?? cancelRequest.error;
 

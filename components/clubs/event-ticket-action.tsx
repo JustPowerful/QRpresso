@@ -20,7 +20,7 @@ export function EventTicketAction(props: EventTicketActionProps) {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   const invalidate = () => queryClient.invalidateQueries();
-  const rsvp = useMutation(trpc.ticket.rsvp.mutationOptions({ onSuccess: invalidate }));
+  const rsvp = useMutation(trpc.ticket.rsvp.mutationOptions({ onSuccess: invalidate, onError: invalidate }));
   const cancelRsvp = useMutation(
     trpc.ticket.cancelRsvp.mutationOptions({ onSuccess: invalidate }),
   );
