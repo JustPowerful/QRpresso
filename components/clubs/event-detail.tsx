@@ -123,6 +123,9 @@ export function EventDetail({ eventId, clubId }: { eventId: string; clubId: stri
               <Link href={`/clubs/${event.club.id}/events/${event.id}/attendees`} className="inline-flex h-9 items-center rounded-md border px-3 text-sm font-medium transition-colors hover:bg-accent">
                 View ticket holders
               </Link>
+              <Link href={`/clubs/${event.club.id}/events/${event.id}/check-in`} className="inline-flex h-9 items-center rounded-md border px-3 text-sm font-medium transition-colors hover:bg-accent">
+                Open check-in scanner
+              </Link>
             </div>
           </div>
         </section>

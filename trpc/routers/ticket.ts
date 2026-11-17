@@ -505,10 +505,64 @@ export const ticketRouter = createTRPCRouter({
           id: true,
           price: true,
           purchasedAt: true,
+          checkedInAt: true,
           user: { select: { id: true, name: true, email: true } },
         },
       });
 
       return { event, tickets };
+    }),
+
+  checkIn: protectedProcedure
+    .input(z.object({ eventId: z.string().min(1), ticketId: z.string().min(1).max(200) }))
+    .mutation(async ({ ctx, input }) => {
+      const event = await db.event.findUnique({
+        where: { id: input.eventId },
+        select: { id: true, clubId: true },
+      });
+      if (!event) throw new TRPCError({ code: "NOT_FOUND", message: "Event not found." });
+
+      const membership = await db.membership.findFirst({
+        where: {
+          clubId: event.clubId,
+          userId: ctx.session.user.id,
+          role: { in: ["FOUNDER", "MANAGER"] },
+        },
+        select: { id: true },
+      });
+      if (!membership) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Only club founders and managers can check in tickets." });
+      }
+
+      const ticket = await db.ticket.findUnique({
+        where: { id: input.ticketId },
+        select: {
+          id: true,
+          eventId: true,
+          checkedInAt: true,
+          user: { select: { name: true } },
+        },
+      });
+      if (!ticket) return { status: "not_found" as const };
+      if (ticket.eventId !== event.id) return { status: "wrong_event" as const };
+      if (ticket.checkedInAt) {
+        return { status: "already_checked_in" as const, checkedInAt: ticket.checkedInAt, name: ticket.user.name };
+      }
+
+      const checkedInAt = new Date();
+      const updated = await db.ticket.updateMany({
+        where: { id: ticket.id, eventId: event.id, checkedInAt: null },
+        data: { checkedInAt },
+      });
+      if (updated.count === 1) {
+        return { status: "checked_in" as const, checkedInAt, name: ticket.user.name };
+      }
+
+      const latest = await db.ticket.findUnique({ where: { id: ticket.id }, select: { checkedInAt: true } });
+      return {
+        status: "already_checked_in" as const,
+        checkedInAt: latest?.checkedInAt ?? checkedInAt,
+        name: ticket.user.name,
+      };
     }),
 });
