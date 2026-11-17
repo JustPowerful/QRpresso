@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, UsersRound } from "lucide-react";
+import { ClubCard } from "@/components/clubs/club-card";
 import { useTRPC } from "@/trpc/client";
 
 export function MyClubs() {
@@ -38,23 +39,7 @@ export function MyClubs() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {clubs.data.map((club) => (
-            <article key={club.id} className="flex min-h-48 flex-col rounded-xl border bg-card p-5 shadow-sm">
-              <div className="mb-4 flex items-center gap-3">
-                {club.profileImage ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={club.profileImage} alt="" className="size-11 rounded-lg border object-cover" />
-                ) : (
-                  <div className="grid size-11 place-items-center rounded-lg bg-secondary text-secondary-foreground"><UsersRound size={19} aria-hidden="true" /></div>
-                )}
-                <div className="min-w-0">
-                  <h2 className="truncate font-semibold"><Link href={`/clubs/${club.id}`} className="hover:underline">{club.name}</Link></h2>
-                  <p className="text-xs text-muted-foreground">Member</p>
-                </div>
-              </div>
-              <p className="line-clamp-3 flex-1 text-sm leading-6 text-muted-foreground">
-                {club.description || "A community for people who want to connect and share ideas."}
-              </p>
-            </article>
+            <ClubCard key={club.id} club={club} subtitle="Your membership" />
           ))}
         </div>
       )}

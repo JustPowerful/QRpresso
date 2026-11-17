@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Search, UsersRound } from "lucide-react";
+import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ClubCard } from "@/components/clubs/club-card";
 import { useTRPC } from "@/trpc/client";
 
 export function DiscoverClubs() {
@@ -72,24 +72,11 @@ export function DiscoverClubs() {
             {clubs.data.clubs.map((club) => {
               const isJoined = joinedIds.has(club.id);
               return (
-                <article key={club.id} className="flex min-h-52 flex-col rounded-xl border bg-card p-5 shadow-sm transition-shadow hover:shadow-md">
-                  <div className="mb-4 flex items-center gap-3">
-                    {club.profileImage ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={club.profileImage} alt="" className="size-11 rounded-lg border object-cover" />
-                    ) : (
-                      <div className="grid size-11 place-items-center rounded-lg bg-secondary text-secondary-foreground"><UsersRound size={19} aria-hidden="true" /></div>
-                    )}
-                    <div className="min-w-0">
-                      <h2 className="truncate font-semibold"><Link href={`/clubs/${club.id}`} className="hover:underline">{club.name}</Link></h2>
-                      <p className="text-xs text-muted-foreground">Club</p>
-                    </div>
-                  </div>
-                  <p className="mb-5 line-clamp-3 flex-1 text-sm leading-6 text-muted-foreground">
-                    {club.description || "A community for people who want to connect and share ideas."}
-                  </p>
-                  <div className="flex items-center justify-between gap-3 border-t pt-4">
-                    <span className="text-xs text-muted-foreground">Created {new Date(club.createdAt).toLocaleDateString()}</span>
+                <ClubCard
+                  key={club.id}
+                  club={club}
+                  subtitle="Community"
+                  footer={
                     <Button
                       type="button"
                       variant={isJoined ? "outline" : "default"}
@@ -99,8 +86,8 @@ export function DiscoverClubs() {
                     >
                       {isJoined ? "Joined" : joinClub.isPending ? "Joining…" : "Join club"}
                     </Button>
-                  </div>
-                </article>
+                  }
+                />
               );
             })}
           </div>

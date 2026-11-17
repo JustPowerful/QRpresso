@@ -11,7 +11,7 @@ export function EventAttendees({ clubId, eventId }: { clubId: string; eventId: s
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
-      <Link href={`/clubs/${clubId}`} className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft size={16} aria-hidden="true" /> Back to club</Link>
+      <Link href={`/clubs/${clubId}/events/${eventId}`} className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft size={16} aria-hidden="true" /> Back to event</Link>
       {attendees.isPending ? (
         <div className="h-56 animate-pulse rounded-xl border bg-muted/40" aria-label="Loading ticket holders" />
       ) : attendees.isError ? (

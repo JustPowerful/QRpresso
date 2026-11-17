@@ -16,6 +16,10 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Image storage
+
+Club profile images, cover images, and event thumbnails are stored in MinIO. Configure `MINIO_ROOT_USER` and `MINIO_ROOT_PASSWORD` in `.env`; the app uses `http://localhost:9000` and creates the `ai-hub-media` bucket by default. Set `MINIO_ENDPOINT` and `MINIO_BUCKET` to override those defaults. The application serves stored images through its own `/api/media` route, so the bucket can remain private.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.

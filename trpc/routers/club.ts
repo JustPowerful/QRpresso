@@ -69,6 +69,14 @@ export const clubRouter = createTRPCRouter({
           role: "FOUNDER",
         },
       });
+      const isMember = await db.membership.findFirst({
+        where: {
+          clubId: input.clubId,
+          userId: ctx.session.user.id,
+          role: "MEMBER",
+        },
+        select: { id: true },
+      });
 
       // inject the boolean flags into the club object to indicate if the user is a founder or manager
       const events = club.events.map(({ _count, tickets, ticketRequests, ...event }) => ({
@@ -85,6 +93,7 @@ export const clubRouter = createTRPCRouter({
         events,
         isFounder: !!isFounder,
         isManager: !!isManager,
+        isMember: !!isMember,
       };
     }),
   joinedClubs: protectedProcedure.query(async ({ ctx }) => {

@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { Pencil, Trash2, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,13 +34,14 @@ function toLocalDateTime(value: Date | string) {
   return local.toISOString().slice(0, 16);
 }
 
-export function EventManagementActions({ event }: { event: EventDetails }) {
+export function EventManagementActions({ event, clubId }: { event: EventDetails; clubId: string }) {
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [eventType, setEventType] = useState(event.eventType);
   const [error, setError] = useState("");
   const trpc = useTRPC();
   const queryClient = useQueryClient();
+  const router = useRouter();
   const refresh = () => queryClient.invalidateQueries();
 
   const updateEvent = useMutation(trpc.event.update.mutationOptions({
@@ -55,6 +57,8 @@ export function EventManagementActions({ event }: { event: EventDetails }) {
       await refresh();
       setDeleteOpen(false);
       setError("");
+      router.push(`/clubs/${clubId}`);
+      router.refresh();
     },
     onError: (mutationError) => setError(mutationError.message),
   }));

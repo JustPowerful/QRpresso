@@ -1,19 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, CalendarDays, MapPin, UsersRound } from "lucide-react";
+import { ArrowLeft, CalendarDays, UsersRound } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { CreateEventDialog } from "@/components/clubs/create-event-dialog";
-import { EventTicketAction } from "@/components/clubs/event-ticket-action";
-import { EventManagementActions } from "@/components/clubs/event-management-actions";
+import { EventCard } from "@/components/clubs/event-card";
+import { ImageUploadButton } from "@/components/clubs/image-upload-button";
 import { useTRPC } from "@/trpc/client";
-
-function formatDate(value: Date | string) {
-  return new Date(value).toLocaleString(undefined, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
-}
 
 export function ClubDetail({ clubId }: { clubId: string }) {
   const trpc = useTRPC();
@@ -37,6 +30,7 @@ export function ClubDetail({ clubId }: { clubId: string }) {
 
   const club = clubQuery.data;
   const canManageEvents = club.isFounder || club.isManager;
+  const canChangeImages = club.isFounder || club.isMember;
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
@@ -47,18 +41,30 @@ export function ClubDetail({ clubId }: { clubId: string }) {
             // eslint-disable-next-line @next/next/no-img-element
             <img src={club.coverImage} alt="" className="size-full object-cover" />
           )}
+          {canChangeImages && (
+            <div className="absolute right-3 top-3">
+              <ImageUploadButton target="club-cover" resourceId={club.id} label="Change cover" variant="secondary" />
+            </div>
+          )}
         </div>
         <div className="flex flex-col gap-5 p-5 sm:flex-row sm:items-end sm:justify-between sm:p-7">
-          <div className="-mt-12 flex min-w-0 items-end gap-4">
-            {club.profileImage ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={club.profileImage} alt="" className="size-20 shrink-0 rounded-xl border-4 border-card bg-card object-cover" />
-            ) : (
-              <div className="grid size-20 shrink-0 place-items-center rounded-xl border-4 border-card bg-primary text-primary-foreground"><UsersRound size={28} aria-hidden="true" /></div>
-            )}
+          <div className="flex min-w-0 items-end gap-4">
+            <div className="-mt-14 shrink-0">
+              {club.profileImage ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={club.profileImage} alt="" className="size-20 rounded-xl border-4 border-card bg-card object-cover" />
+              ) : (
+                <div className="grid size-20 place-items-center rounded-xl border-4 border-card bg-primary text-primary-foreground"><UsersRound size={28} aria-hidden="true" /></div>
+              )}
+            </div>
             <div className="min-w-0 pb-1">
               <h1 className="truncate font-[family-name:var(--font-heading)] text-3xl tracking-tight sm:text-4xl">{club.name}</h1>
               <p className="mt-1 text-sm text-muted-foreground">Created {new Date(club.createdAt).toLocaleDateString()}</p>
+              {canChangeImages && (
+                <div className="mt-2">
+                  <ImageUploadButton target="club-profile" resourceId={club.id} label="Change profile image" />
+                </div>
+              )}
             </div>
           </div>
           {canManageEvents && <CreateEventDialog clubId={club.id} />}
@@ -82,41 +88,7 @@ export function ClubDetail({ clubId }: { clubId: string }) {
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {club.events.map((event) => (
-              <article key={event.id} className="rounded-xl border bg-card p-5 shadow-sm">
-                <div className="mb-3 flex items-center gap-2 text-xs font-medium text-muted-foreground"><CalendarDays size={15} aria-hidden="true" /> {formatDate(event.date)}</div>
-                <h3 className="text-lg font-semibold">{event.name}</h3>
-                {event.description && <p className="mt-2 line-clamp-3 text-sm leading-6 text-muted-foreground">{event.description}</p>}
-                <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-muted-foreground">
-                  {event.location && <span className="inline-flex items-center gap-1.5"><MapPin size={14} aria-hidden="true" />{event.location}</span>}
-                  <span>{event.eventType === "PAID" ? `Paid · ${event.price.toFixed(2)}` : "Free"}</span>
-                </div>
-                <EventTicketAction
-                  eventId={event.id}
-                  eventType={event.eventType}
-                  price={event.price}
-                  attendeeCount={event.attendeeCount}
-                  attendeeLimit={event.attendeeLimit}
-                  viewerTicketId={event.viewerTicketId}
-                  viewerTicketRequest={event.viewerTicketRequest}
-                  date={event.date}
-                  isUpcoming={event.isUpcoming}
-                />
-                {canManageEvents && (
-                  <div className="mt-3 flex flex-wrap gap-3 border-t pt-3">
-                    <EventManagementActions event={event} />
-                    {event.eventType === "PAID" && (
-                      <Link href={`/clubs/${club.id}/events/${event.id}/requests`} className="text-xs font-medium text-primary underline-offset-4 hover:underline">
-                        Manage ticket requests
-                      </Link>
-                    )}
-                    <Link href={`/clubs/${club.id}/events/${event.id}/attendees`} className="text-xs font-medium text-primary underline-offset-4 hover:underline">
-                      View ticket holders
-                    </Link>
-                  </div>
-                )}
-              </article>
-            ))}
+            {club.events.map((event) => <EventCard key={event.id} clubId={club.id} event={event} />)}
           </div>
         )}
       </section>

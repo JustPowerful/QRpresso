@@ -11,9 +11,24 @@ services:
       - ai-hub-postgres-data:/var/lib/postgresql/data
     networks:
       - ai-hub-network
+  minio:
+    image: quay.io/minio/minio
+    container_name: ai-hub-minio
+    restart: "no"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    env_file:
+      - .env
+    volumes:
+      - ai-hub-minio-data:/data
+    networks:
+      - ai-hub-network
+    command: server /data --console-address ":9001"
 
 volumes:
   ai-hub-postgres-data:
+  ai-hub-minio-data:
 
 networks:
   ai-hub-network:

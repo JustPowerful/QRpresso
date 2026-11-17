@@ -4,6 +4,60 @@ import { db } from "@/lib/db";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 
 export const eventRouter = createTRPCRouter({
+  getById: protectedProcedure
+    .input(z.object({ eventId: z.string().min(1), clubId: z.string().min(1) }))
+    .query(async ({ ctx, input }) => {
+      const event = await db.event.findUnique({
+        where: { id: input.eventId, clubId: input.clubId },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          date: true,
+          location: true,
+          thumbnail: true,
+          eventType: true,
+          price: true,
+          attendeeLimit: true,
+          club: { select: { id: true, name: true } },
+          _count: {
+            select: {
+              tickets: true,
+              ticketRequests: { where: { status: { in: ["pending", "approved"] } } },
+            },
+          },
+          tickets: {
+            where: { userId: ctx.session.user.id },
+            select: { id: true },
+            take: 1,
+          },
+          ticketRequests: {
+            where: { userId: ctx.session.user.id },
+            orderBy: { requestedAt: "desc" },
+            select: { id: true, status: true },
+            take: 1,
+          },
+        },
+      });
+      if (!event) throw new TRPCError({ code: "NOT_FOUND", message: "Event not found." });
+
+      const memberships = await db.membership.findMany({
+        where: { clubId: event.club.id, userId: ctx.session.user.id },
+        select: { role: true },
+      });
+      const roles = new Set(memberships.map(({ role }) => role));
+      const { _count, tickets, ticketRequests, ...details } = event;
+      return {
+        ...details,
+        isUpcoming: event.date > new Date(),
+        attendeeCount: _count.tickets + (event.eventType === "PAID" ? _count.ticketRequests : 0),
+        viewerTicketId: tickets[0]?.id ?? null,
+        viewerTicketRequest: ticketRequests[0] ?? null,
+        isFounder: roles.has("FOUNDER"),
+        isManager: roles.has("MANAGER"),
+        isMember: roles.has("MEMBER"),
+      };
+    }),
   create: protectedProcedure
     .input(
       z
