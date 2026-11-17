@@ -47,7 +47,7 @@ export function MyClubs() {
                   <div className="grid size-11 place-items-center rounded-lg bg-secondary text-secondary-foreground"><UsersRound size={19} aria-hidden="true" /></div>
                 )}
                 <div className="min-w-0">
-                  <h2 className="truncate font-semibold">{club.name}</h2>
+                  <h2 className="truncate font-semibold"><Link href={`/clubs/${club.id}`} className="hover:underline">{club.name}</Link></h2>
                   <p className="text-xs text-muted-foreground">Member</p>
                 </div>
               </div>

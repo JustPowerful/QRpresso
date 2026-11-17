@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Search, UsersRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -80,7 +81,7 @@ export function DiscoverClubs() {
                       <div className="grid size-11 place-items-center rounded-lg bg-secondary text-secondary-foreground"><UsersRound size={19} aria-hidden="true" /></div>
                     )}
                     <div className="min-w-0">
-                      <h2 className="truncate font-semibold">{club.name}</h2>
+                      <h2 className="truncate font-semibold"><Link href={`/clubs/${club.id}`} className="hover:underline">{club.name}</Link></h2>
                       <p className="text-xs text-muted-foreground">Club</p>
                     </div>
                   </div>

@@ -5,6 +5,88 @@ import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { Prisma } from "@/app/generated/prisma/client";
 
 export const clubRouter = createTRPCRouter({
+  getClubById: protectedProcedure
+    .input(z.object({ clubId: z.string().min(1) }))
+    .query(async ({ input, ctx }) => {
+      const club = await db.club.findUnique({
+        where: { id: input.clubId },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          createdAt: true,
+          profileImage: true,
+          coverImage: true,
+          events: {
+            orderBy: { date: "asc" },
+            select: {
+              id: true,
+              name: true,
+              description: true,
+              date: true,
+              location: true,
+              thumbnail: true,
+              eventType: true,
+              price: true,
+              attendeeLimit: true,
+              _count: {
+                select: {
+                  tickets: true,
+                  ticketRequests: {
+                    where: { status: { in: ["pending", "approved"] } },
+                  },
+                },
+              },
+              tickets: {
+                where: { userId: ctx.session.user.id },
+                select: { id: true },
+                take: 1,
+              },
+              ticketRequests: {
+                where: { userId: ctx.session.user.id },
+                orderBy: { requestedAt: "desc" },
+                select: { id: true, status: true },
+                take: 1,
+              },
+            },
+          },
+        },
+      });
+      if (!club)
+        throw new TRPCError({ code: "NOT_FOUND", message: "Club not found." });
+
+      const isManager = await db.membership.findFirst({
+        where: {
+          clubId: input.clubId,
+          userId: ctx.session.user.id,
+          role: "MANAGER",
+        },
+      });
+      const isFounder = await db.membership.findFirst({
+        where: {
+          clubId: input.clubId,
+          userId: ctx.session.user.id,
+          role: "FOUNDER",
+        },
+      });
+
+      // inject the boolean flags into the club object to indicate if the user is a founder or manager
+      const events = club.events.map(({ _count, tickets, ticketRequests, ...event }) => ({
+        ...event,
+        isUpcoming: event.date > new Date(),
+        attendeeCount:
+          _count.tickets + (event.eventType === "PAID" ? _count.ticketRequests : 0),
+        viewerTicketId: tickets[0]?.id ?? null,
+        viewerTicketRequest: ticketRequests[0] ?? null,
+      }));
+
+      return {
+        ...club,
+        events,
+        isFounder: !!isFounder,
+        isManager: !!isManager,
+      };
+    }),
   joinedClubs: protectedProcedure.query(async ({ ctx }) => {
     const memberships = await db.membership.findMany({
       where: { userId: ctx.session.user.id },

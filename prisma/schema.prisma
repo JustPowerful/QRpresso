@@ -100,7 +100,7 @@ model Membership {
   id String @id @default(uuid())
   userId String
   clubId String
-  role String @default("member")
+  role Role @default(MEMBER)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -110,6 +110,11 @@ model Membership {
 
   @@index([userId])
   @@index([clubId])
+}
+
+enum EventType {
+  FREE
+  PAID
 }
 
 model Event {
@@ -130,6 +135,9 @@ model Event {
   tickets Ticket[]
   ticketRequests TicketRequest[]
 
+  eventType EventType @default(FREE) // The type of the event, either FREE or PAID
+  price Float @default(0) // The ticket price for paid events; free events use 0
+  attendeeLimit Int? // Optional limit on the number of attendees for the event
   @@index([clubId])
 }
 
