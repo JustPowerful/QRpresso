@@ -41,13 +41,19 @@ export function CreateClubDialog() {
     const formData = new FormData(event.currentTarget);
     createClub.mutate({
       name: String(formData.get("name") ?? "").trim(),
-      description: String(formData.get("description") ?? "").trim() || undefined,
+      description:
+        String(formData.get("description") ?? "").trim() || undefined,
     });
   }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <Button type="button" onClick={() => setOpen(true)} aria-label="Create club" className="size-9 gap-2 px-0 sm:h-9 sm:w-auto sm:px-4">
+      <Button
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-label="Create club"
+        className="size-9  px-0 text-sm normal-case tracking-normal shadow-sm sm:h-10 sm:w-auto sm:px-4"
+      >
         <Plus aria-hidden="true" />
         <span className="hidden sm:inline">Create club</span>
       </Button>
@@ -58,7 +64,9 @@ export function CreateClubDialog() {
             <div className="mb-6 flex items-start justify-between gap-4">
               <div>
                 <DialogTitle>Create a club</DialogTitle>
-                <DialogDescription>Start a place for your community to meet and grow.</DialogDescription>
+                <DialogDescription>
+                  Start a place for your community to meet and grow.
+                </DialogDescription>
               </div>
               <Button
                 type="button"
@@ -72,11 +80,29 @@ export function CreateClubDialog() {
             </div>
             <form className="space-y-5" onSubmit={handleSubmit}>
               <div className="space-y-2">
-                <label htmlFor="club-name" className="text-sm font-medium">Club name</label>
-                <Input id="club-name" name="name" minLength={2} maxLength={100} placeholder="e.g. Design Circle" required autoFocus />
+                <label htmlFor="club-name" className="text-sm font-medium">
+                  Club name
+                </label>
+                <Input
+                  id="club-name"
+                  name="name"
+                  minLength={2}
+                  maxLength={100}
+                  placeholder="e.g. Design Circle"
+                  required
+                  autoFocus
+                />
               </div>
               <div className="space-y-2">
-                <label htmlFor="club-description" className="text-sm font-medium">Description <span className="font-normal text-muted-foreground">(optional)</span></label>
+                <label
+                  htmlFor="club-description"
+                  className="text-sm font-medium"
+                >
+                  Description{" "}
+                  <span className="font-normal text-muted-foreground">
+                    (optional)
+                  </span>
+                </label>
                 <textarea
                   id="club-description"
                   name="description"
@@ -86,9 +112,19 @@ export function CreateClubDialog() {
                   className="w-full resize-y rounded-md border border-input bg-background px-3.5 py-3 text-sm shadow-xs outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
                 />
               </div>
-              {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+              {error && (
+                <p role="alert" className="text-sm text-destructive">
+                  {error}
+                </p>
+              )}
               <div className="flex justify-end gap-2 pt-1">
-                <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setOpen(false)}
+                >
+                  Cancel
+                </Button>
                 <Button type="submit" disabled={createClub.isPending}>
                   {createClub.isPending ? "Creating…" : "Create club"}
                 </Button>
