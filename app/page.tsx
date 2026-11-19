@@ -1,5 +1,3 @@
-import { redirect } from "next/navigation";
-
 export default function Home() {
-  redirect("/clubs");
+  return <div>Redirecting ...</div>;
 }
