@@ -1,0 +1,63 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: ai-hub-postgres
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    volumes:
+      - ai-hub-postgres-data:/var/lib/postgresql/data
+    networks:
+      - ai-hub-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  minio:
+    image: quay.io/minio/minio
+    container_name: ai-hub-minio
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    volumes:
+      - ai-hub-minio-data:/data
+    networks:
+      - ai-hub-network
+    command: server /data --console-address ":9001"
+
+  qrpresso:
+    image: qrpresso:latest
+    container_name: qrpresso
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    ports:
+      - "3000:3000"
+    networks:
+      - ai-hub-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://localhost:3000').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  ai-hub-postgres-data:
+  ai-hub-minio-data:
+
+networks:
+  ai-hub-network:
+    driver: bridge
