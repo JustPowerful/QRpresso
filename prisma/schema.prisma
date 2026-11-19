@@ -89,6 +89,9 @@ model Club {
   description String?
   profileImage String?
   coverImage String?
+
+  location String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

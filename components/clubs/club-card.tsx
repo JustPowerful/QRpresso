@@ -1,10 +1,11 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { ArrowRight, UsersRound } from "lucide-react";
+import { ArrowRight, MapPin, UsersRound } from "lucide-react";
 
 type ClubCardData = {
   id: string;
   name: string;
+  location: string | null;
   description: string | null;
   createdAt: Date | string;
   profileImage: string | null;
@@ -44,6 +45,7 @@ export function ClubCard({
           <h2 className="truncate text-lg font-semibold tracking-tight">
             <Link href={`/clubs/${club.id}`} className="decoration-primary/50 underline-offset-4 transition-colors group-hover:underline">{club.name}</Link>
           </h2>
+          {club.location && <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground"><MapPin size={14} aria-hidden="true" /><span className="truncate">{club.location}</span></p>}
         </div>
         <p className="mt-2 line-clamp-2 flex-1 text-sm leading-6 text-muted-foreground">
           {club.description || "A community for people who want to connect and share ideas."}

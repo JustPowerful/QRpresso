@@ -43,6 +43,7 @@ export function CreateClubDialog() {
       name: String(formData.get("name") ?? "").trim(),
       description:
         String(formData.get("description") ?? "").trim() || undefined,
+      location: String(formData.get("location") ?? "").trim() || undefined,
     });
   }
 
@@ -94,6 +95,20 @@ export function CreateClubDialog() {
                 />
               </div>
               <div className="space-y-2">
+                <label htmlFor="location" className="text-sm font-medium">
+                  Location
+                </label>
+                <Input
+                  id="location"
+                  name="location"
+                  minLength={2}
+                  maxLength={100}
+                  placeholder="e.g. Design Circle"
+                  required
+                  autoFocus
+                />
+              </div>
+              <div className="space-y-2">
                 <label
                   htmlFor="club-description"
                   className="text-sm font-medium"
@@ -112,6 +127,7 @@ export function CreateClubDialog() {
                   className="w-full resize-y rounded-md border border-input bg-background px-3.5 py-3 text-sm shadow-xs outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
                 />
               </div>
+
               {error && (
                 <p role="alert" className="text-sm text-destructive">
                   {error}

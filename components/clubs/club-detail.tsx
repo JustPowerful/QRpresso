@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, CalendarDays, UsersRound } from "lucide-react";
+import { ArrowLeft, CalendarDays, MapPin, UsersRound } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { CreateEventDialog } from "@/components/clubs/create-event-dialog";
 import { EventCard } from "@/components/clubs/event-card";
@@ -59,6 +59,7 @@ export function ClubDetail({ clubId }: { clubId: string }) {
             </div>
             <div className="min-w-0 pb-1">
               <h1 className="truncate font-[family-name:var(--font-heading)] text-3xl tracking-tight sm:text-4xl">{club.name}</h1>
+              {club.location && <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground"><MapPin size={15} aria-hidden="true" /><span>{club.location}</span></p>}
               <p className="mt-1 text-sm text-muted-foreground">Created {new Date(club.createdAt).toLocaleDateString()}</p>
               {canChangeImages && (
                 <div className="mt-2">

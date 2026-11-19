@@ -13,6 +13,7 @@ export const clubRouter = createTRPCRouter({
         select: {
           id: true,
           name: true,
+          location: true,
           description: true,
           createdAt: true,
           profileImage: true,
@@ -79,14 +80,17 @@ export const clubRouter = createTRPCRouter({
       });
 
       // inject the boolean flags into the club object to indicate if the user is a founder or manager
-      const events = club.events.map(({ _count, tickets, ticketRequests, ...event }) => ({
-        ...event,
-        isUpcoming: event.date > new Date(),
-        attendeeCount:
-          _count.tickets + (event.eventType === "PAID" ? _count.ticketRequests : 0),
-        viewerTicketId: tickets[0]?.id ?? null,
-        viewerTicketRequest: ticketRequests[0] ?? null,
-      }));
+      const events = club.events.map(
+        ({ _count, tickets, ticketRequests, ...event }) => ({
+          ...event,
+          isUpcoming: event.date > new Date(),
+          attendeeCount:
+            _count.tickets +
+            (event.eventType === "PAID" ? _count.ticketRequests : 0),
+          viewerTicketId: tickets[0]?.id ?? null,
+          viewerTicketRequest: ticketRequests[0] ?? null,
+        }),
+      );
 
       return {
         ...club,
@@ -104,6 +108,7 @@ export const clubRouter = createTRPCRouter({
           select: {
             id: true,
             name: true,
+            location: true,
             description: true,
             createdAt: true,
             profileImage: true,
@@ -145,6 +150,7 @@ export const clubRouter = createTRPCRouter({
           select: {
             id: true,
             name: true,
+            location: true,
             description: true,
             createdAt: true,
             profileImage: true,
@@ -196,6 +202,7 @@ export const clubRouter = createTRPCRouter({
       z.object({
         name: z.string().trim().min(2).max(100),
         description: z.string().trim().max(1000).optional(),
+        location: z.string().trim().max(200).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -204,6 +211,7 @@ export const clubRouter = createTRPCRouter({
           data: {
             name: input.name,
             description: input.description || null,
+            location: input.location || null,
           },
           select: { id: true, name: true, description: true },
         });
